@@ -1,3 +1,6 @@
+// økt 1.3
+
+
 void setup() {
   pinMode(LED_BUILTIN, OUTPUT);
 }
