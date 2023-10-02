@@ -1,0 +1,1 @@
+Fant det ut i løpet av Økt 3.
