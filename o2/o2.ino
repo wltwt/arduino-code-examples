@@ -1,5 +1,5 @@
 // Økt 2
-// NB! viktig å bruke en utgangspin som har ~ forran seg
+// PWM pin har ~ forran
 
 #define COMMON_ANODE
 
