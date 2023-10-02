@@ -85,7 +85,7 @@ void ledChange() {
 /*
   Ikke-blokkerende metode som leser verdien til fotocellen hvert 2. millisekund.
   Ser ut som man bør gjøre det slik at analog til digital konvertoren får litt tid
-  til å kjøle seg mellom hver lesing.
+  mellom hver lesing.
 */
 void readPhotocell(int timer) {
   photocell.now = millis();
