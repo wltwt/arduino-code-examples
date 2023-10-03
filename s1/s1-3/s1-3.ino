@@ -46,6 +46,11 @@ PWM pwm = {11, 0, 11}; // kanskje ikke beste variabelnavn
 RGB rgb;
 Usertime t, photocell;
 State state;
+int value_1 = 0;
+int value_2 = 0;
+int value_3 = 0;
+
+float offset_1 = 0.0;
 
 void setup() {
   Serial.begin(9600);
@@ -57,37 +62,43 @@ void setup() {
 }
 
 void loop() {
-    debounceButton();
+  static int i = 0;
+  float angle = radians(i);
+  debounceButton();
+  
+  value_1 = (255/2) * (sin(angle+offset_1) + 1);
+  value_2 = (255/2) * (sin(angle-offset_1) + 1);
+  value_3 = (255/2) * (sin(angle) + 1);
+  delay(5);
+  // Serial.println(value_1);
 
-    if (button.count % 3 == 0) {
-      setColor(0, 255, 255);
-    } else if (button.holdTime > 1000) {
-      setColor(255,255,0);
-      button.holdTime = 0;
-    }
+  if (button.count % 3 == 1) {
+    setColor(value_1, value_2, value_3);
+  } else if (button.count  % 3 == 2) {
+    setColor(255,255,0);
+  } else {
+    setColor(0,0,0);
+  }
+  readPhotocell(2);
 
-    if (button.count == 500) {
-      analogWrite(pwm.pin, map(pwm.value, 0, 255+abs(pwm.change), 0, 255));
-      setColor(state.A0_Value,(state.A0_Value + state.count) % 255,(state.A0_Value + (state.count+10)) % 255);
-      pwm.value = pwm.value + pwm.change;
-      if (pwm.value <= 0 || pwm.value >= 255 ) {
-          pwm.change = -pwm.change;
-          state.count = state.count + 10;
-      }
-    } 
-    readPhotocell(2);
+
+  if (i >= 360){
+    i = 0;
+  } else {
+    i++;
+    offset_1 += 0.001;
+  }
 }
 
 void setColor(int red, int green, int blue) {
-    #ifdef COMMON_ANODE
-        red = 255 - red;
-        green = 255 - green;
-        blue = 255 - blue;
-    #endif
-
-    analogWrite(rgb.pins[0], red);
-    analogWrite(rgb.pins[1], green);
-    analogWrite(rgb.pins[2], blue);
+  #ifdef COMMON_ANODE
+      red = 255 - red;
+      green = 255 - green;
+      blue = 255 - blue;
+  #endif
+  analogWrite(rgb.pins[0], red);
+  analogWrite(rgb.pins[1], green);
+  analogWrite(rgb.pins[2], blue);
 }
 
 void updatePhotocell(int pin) {
