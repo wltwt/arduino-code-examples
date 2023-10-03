@@ -3,30 +3,54 @@
   Økt 8: glatting av sensorverdier
 
 */
-int* ptr;
-int i;
-int a_size = 100;
+const int size = 10;
 
-int* initArray() {
-  static int a[50];
-  for (int i = 0; i < 50; i++)
-  {
-    a[i] = i;
-  }
-  return a;
-}
+int readings[size];
+int rIndex = 0;
+int total = 0;
+int average = 0;
 
+int current = 0;
+const int timer = 100;
+
+struct Pin {
+  const int photocell = A0;
+};
+
+Pin pin;
 
 void setup() {
-  ptr = initArray();
   Serial.begin(9600);
+  for (int i = 0; i < size; i++) {
+    readings[i] = 0;
+  }
 }
 
 void loop() {
-  if (i == 50) {
-    i = 0;
+  total -= readings[rIndex];
+  readings[rIndex] = analogRead(pin.photocell);
+  total += readings[rIndex];
+  rIndex++;
+
+  if (rIndex >= size) {
+    rIndex = 0;
   }
-  Serial.println(ptr[i]);
-  i++;
-  delay(200);
+
+  average = total / size;
+
+  if (millis() - current >= timer) {
+    current = millis();
+
+    Serial.print("Med glatting: ");
+
+    Serial.print(average);
+
+    Serial.print(", Uten glatting: ");
+
+    Serial.print(analogRead(pin.photocell));
+
+    Serial.println("");
+  }
+
+  delay(1);
 }
