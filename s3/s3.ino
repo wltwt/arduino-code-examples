@@ -2,8 +2,8 @@
   Selvstudiumsoppgave 3
   1 og 2
 
-  Kontinuerlig overvåking av sensorverdi med glatting der verdiene blir
-  brukt til å utføre operasjoner på komponenter.
+  Kontinuerlig overvåking av sensorverdi med glatting,
+  der verdiene blir brukt til å utføre operasjoner på komponenter.
 */
 
 const int size = 10;
