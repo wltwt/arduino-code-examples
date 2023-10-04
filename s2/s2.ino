@@ -44,8 +44,8 @@ struct Button {
 Button button = {7, HIGH, 0, 25, HIGH};
 PWM pwm = {11, 0, 11}; // kanskje ikke beste variabelnavn
 RGB rgb;
-Usertime t, photocell;
-State state;
+Usertime t, photocell, blink;
+State state, ledRGB;
 
 void setup() {
   Serial.begin(9600);
@@ -59,23 +59,7 @@ void setup() {
 void loop() {
     debounceButton();
 
-    if (button.holdTime > 500 && button.holdTime < 1000) {
-      setColor(0, 255, 255);
-      button.holdTime = 0;
-    } else if (button.holdTime > 1000) {
-      setColor(255,255,0);
-      button.holdTime = 0;
-    }
-
-    if (button.count == 500) {
-      analogWrite(pwm.pin, map(pwm.value, 0, 255+abs(pwm.change), 0, 255));
-      setColor(state.A0_Value,(state.A0_Value + state.count) % 255,(state.A0_Value + (state.count+10)) % 255);
-      pwm.value = pwm.value + pwm.change;
-      if (pwm.value <= 0 || pwm.value >= 255 ) {
-          pwm.change = -pwm.change;
-          state.count = state.count + 10;
-      }
-    } 
+    blinkRGB(button.holdTime);
     readPhotocell(2);
 }
 
@@ -95,6 +79,18 @@ void updatePhotocell(int pin) {
   state.A0_Value = map(analogRead(pin), 200, 0, 0, 255);
 }
 
+void blinkRGB(int timer) {
+  blink.now = millis();
+  if (blink.now - blink.earlier >= timer) {
+    blink.earlier=blink.now;
+    if (ledRGB.led) {
+      ledRGB.led = LOW;
+    } else {
+      ledRGB.led = HIGH;
+    }
+    setColor(ledRGB.led, ledRGB.led, ledRGB.led);
+  } 
+}
 /*
   Ikke-blokkerende metode som leser verdien til fotocellen hvert 2. millisekund.
   Ser ut som man bør gjøre det slik at analog til digital konvertoren får litt tid
@@ -132,8 +128,6 @@ void debounceButton() {
       if(button.state == LOW) {
         button.toggle = !button.toggle;
         button.count++;
-
-
       }
     }
   }
